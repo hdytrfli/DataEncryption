@@ -51,7 +51,10 @@ const getUsers = async (req, res) => {
 	const decryptedData = users.map((user) => {
 		const decryptedData = {};
 		Object.keys(user).forEach((key) => {
-			if (key === 'id') return;
+			if (key === 'id') {
+				decryptedData[key] = user[key];
+				return;
+			}
 			decryptedData[key] = decryptData(user[key]);
 		});
 		return decryptedData;
