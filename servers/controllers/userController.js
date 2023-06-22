@@ -1,90 +1,70 @@
 const prisma = require('../connections/prisma');
-const { encryptData, decryptData } = require('../utils/encryption');
+
+const {
+	encryptAES,
+	decryptAES,
+	encryptDES,
+	decryptDES,
+} = require('../utils/encryption');
+
 const { generateMockData } = require('../utils/factory');
 
-// function to create a new user
-const createUser = async (req, res) => {
-	// get the data from the request body
-	// const {
-	// 	nama,
-	// 	nik,
-	// 	jenisKelamin,
-	// 	telefon,
-	// 	email,
-	// 	alamat,
-	// 	pekerjaan,
-	// 	golDarah,
-	// } = req.body;
-
-	const data = {
-		nama: req.body.nama,
-		nik: req.body.nik,
-		jenisKelamin: req.body.jenisKelamin,
-		telefon: req.body.telefon,
-		email: req.body.email,
-		alamat: req.body.alamat,
-		pekerjaan: req.body.pekerjaan,
-		golDarah: req.body.golDarah,
-	};
-
-	// encrypt the data using
-	const encryptedData = {};
-
-	Object.keys(data).forEach((key) => {
-		encryptedData[key] = encryptData(data[key]);
-	});
-
-	const user = await prisma.user.create({
-		data: encryptedData,
-	});
-
-	// set status code and send the response
-	res.status(201).json(user);
-};
-
-// function to get all users
 const getUsers = async (req, res) => {
-	// get all users from the database
-	const users = await prisma.user.findMany();
+	const { count, method } = req.query;
 
-	// decrypt the data
-	const decryptedData = users.map((user) => {
-		const decryptedData = {};
-		Object.keys(user).forEach((key) => {
-			if (key === 'id') {
-				decryptedData[key] = user[key];
-				return;
-			}
-			decryptedData[key] = decryptData(user[key]);
-		});
-		return decryptedData;
+	if (!count || !method) {
+		return res
+			.status(400)
+			.json({ message: 'Bad request, count and method are required' });
+	}
+
+	const users = await prisma.user.findMany({
+		take: parseInt(count),
 	});
 
-	// set status code and send the response
+	if (users.length === 0) {
+		return res.status(404).json({ message: 'Users not found' });
+	}
+
+	const decryptedData = users.map((user) => {
+		return Object.keys(user).reduce((acc, key) => {
+			if (key === 'id') {
+				acc[key] = user[key];
+				return acc;
+			}
+			acc[key] =
+				method === 'aes'
+					? decryptAES(user[key])
+					: decryptDES(user[key]);
+			return acc;
+		}, {});
+	});
+
 	res.status(200).json(decryptedData);
 };
 
-// function to generate mock data
 const generateUsers = async (req, res) => {
-	// get number from query params
-	const { number } = req.query;
+	const { count, method } = req.query;
+
+	if (!count || !method) {
+		return res
+			.status(400)
+			.json({ message: 'Bad request, count and method are required' });
+	}
 
 	try {
-		// call the generateMockData function from utils/factory.js
-		const mockData = generateMockData(number);
+		const mockData = generateMockData(count);
 
-		// res.status(200).json(mockData);
-
-		// encrypt the data
 		const encryptedData = mockData.map((data) => {
-			const encryptedData = {};
-			Object.keys(data).forEach((key) => {
-				encryptedData[key] = encryptData(data[key]);
-			});
-			return encryptedData;
+			return Object.keys(data).reduce((acc, key) => {
+				acc[key] =
+					method === 'aes'
+						? encryptAES(data[key])
+						: encryptDES(data[key]);
+				return acc;
+			}, {});
 		});
 
-		// create the mock data
 		const users = await prisma.user.createMany({ data: encryptedData });
 		res.status(201).json(users);
 	} catch (error) {
@@ -93,16 +73,18 @@ const generateUsers = async (req, res) => {
 	}
 };
 
-const deleteAllUsers = async (req, res) => {
+const deleteUsers = async (req, res) => {
 	try {
-		// delete all users
 		const users = await prisma.user.deleteMany();
 		res.status(200).json(users);
 	} catch (error) {
-		// catch any error
 		console.error(error);
 		res.status(500).json({ message: 'Internal server error' });
 	}
 };
 
-module.exports = { createUser, getUsers, generateUsers, deleteAllUsers };
+module.exports = {
+	getUsers,
+	generateUsers,
+	deleteUsers,
+};

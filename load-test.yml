@@ -1,0 +1,11 @@
+# artillery config
+config:
+	target: "http://localhost:3000"
+	phases:
+		- duration: 60
+		  arrivalRate: 10
+	scenarios:
+		- name: Create 100 mock data
+		flow:
+			- get:
+				url: "/api/v1/users/mock

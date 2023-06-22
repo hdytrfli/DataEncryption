@@ -1,0 +1,92 @@
+
+1. Encrypted
+
+Generating 100 requests with 100 Virtual Users
+http.codes.201: 10000
+http.request_rate: 502/sec
+http.requests: 10000
+http.response_time:
+  min: 4
+  max: 376
+  median: 190.6
+  p95: 228.2
+  p99: 252.2
+http.responses: 10000
+vusers.completed: 100
+vusers.created: 100
+vusers.created_by_name.0: 100
+vusers.failed: 0
+vusers.session_length:
+  min: 18808.4
+  max: 19170.5
+  median: 18963.6
+  p95: 19346.7
+  p99: 19346.7
+
+Fethching 100 requests with 100 Virtual Users (1 request retrieve 1 records)
+http.codes.200: 10000
+http.request_rate: 538/sec
+http.requests: 10000
+http.response_time:
+  min: 25
+  max: 265
+  median: 156
+  p95: 194.4
+  p99: 237.5
+http.responses: 10000
+vusers.completed: 100
+vusers.created: 100
+vusers.created_by_name.0: 100
+vusers.failed: 0
+vusers.session_length:
+  min: 15248.5
+  max: 15897.6
+  median: 15839.7
+  p95: 15839.7
+  p99: 15839.7
+
+2. Non-Encrypted
+
+Generating 100 requests with 100 Virtual Users
+http.codes.201: 10000
+http.request_rate: 1115/sec
+http.requests: 10000
+http.response_time:
+  min: 2
+  max: 121
+  median: 55.2
+  p95: 82.3
+  p99: 104.6
+http.responses: 10000
+vusers.completed: 100
+vusers.created: 100
+vusers.created_by_name.0: 100
+vusers.failed: 0
+vusers.session_length:
+  min: 5056.9
+  max: 5826.5
+  median: 5711.5
+  p95: 5826.9
+  p99: 5826.9
+
+Fethching 100 requests with 100 Virtual Users (1 request retrieve 1 records)
+http.codes.200: 10000
+http.request_rate: 2085/sec
+http.requests: 10000
+http.response_time:
+  min: 1
+  max: 87
+  median: 39.3
+  p95: 63.4
+  p99: 71.5
+http.responses: 10000
+vusers.completed: 100
+vusers.created: 100
+vusers.created_by_name.0: 100
+vusers.failed: 0
+vusers.session_length:
+  min: 3223.7
+  max: 4134.7
+  median: 3984.7
+  p95: 4147.4
+  p99: 4147.4
